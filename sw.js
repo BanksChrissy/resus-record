@@ -1,0 +1,6 @@
+// Persist only this fixed application shell. Clinical events never enter this cache.
+const CACHE='resus-shell-v4';
+const SHELL=['./','./index.html','./style.css','./rainbow.css','./app.mjs','./clinical.mjs','./export.mjs','./pdf-lib.min.js'];
+self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(CACHE);await cache.addAll(SHELL);await self.skipWaiting();})()));
+self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('resus-shell-')&&key!==CACHE)await caches.delete(key);await self.clients.claim();})()));
+self.addEventListener('fetch',event=>{const url=new URL(event.request.url);if(event.request.method!=='GET'||url.origin!==self.location.origin)return;const root=new URL('./',self.location.href);const paths=SHELL.map(p=>new URL(p,root).pathname);if(!paths.includes(url.pathname))return;event.respondWith((async()=>{const c=await caches.open(CACHE);const exact=await c.match(new Request(url.origin+url.pathname));if(exact)return exact;return fetch(event.request);})());});
