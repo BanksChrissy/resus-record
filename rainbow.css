@@ -51,3 +51,10 @@ main>.workspace{min-width:0}
 @media(max-width:1100px) and (min-width:901px){main{grid-template-columns:128px minmax(0,1fr) 270px}main.log-collapsed{grid-template-columns:128px minmax(0,1fr) 110px}.workspace{padding:12px}.fast-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){main,main.log-collapsed{display:grid;grid-template-columns:132px minmax(0,1fr)}.section-sidebar{grid-column:1;grid-row:1 / span 2}main>.workspace{grid-column:2;grid-row:1}main>aside{grid-column:2;grid-row:2;position:static;min-height:0;border-top:1px solid #a9bac8}.fast-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.log-collapsed aside>.section-heading{display:flex}}
 @media(max-width:550px){main,main.log-collapsed{grid-template-columns:92px minmax(0,1fr)}.section-sidebar{padding:10px 5px;gap:6px}.section-sidebar button{font-size:12px;padding:12px 6px;min-height:62px;border-left-width:4px}.workspace{padding:10px}.timers{grid-template-columns:1fr}.quick-cpr{grid-template-columns:1fr}.quick-cpr .cpr-state{grid-column:auto}.fast-grid,.cause-grid,.action-grid{grid-template-columns:1fr}.pending-row{flex-wrap:wrap}}
+
+/* Continuous ImageTrend-style rail, without gaps between section controls. */
+.section-sidebar{gap:0;padding:0;align-self:stretch;max-height:none;min-height:100%;background:#d8e1e9;overflow:visible}
+.section-sidebar button{border-radius:0;border-top:0;border-right:0;border-bottom:1px solid #a9bac8;margin:0;min-height:68px;padding:16px 8px}
+.section-sidebar button:nth-child(5){border-right:0}
+.section-sidebar button.active{box-shadow:inset -4px 0 #182f43}
+@media(max-width:550px){.section-sidebar{gap:0;padding:0}.section-sidebar button{min-height:64px;padding:14px 5px}}
