@@ -12,7 +12,7 @@ Dose and energy calculations are references, never automatic orders or administr
 
 Load the app online and wait for **Offline ready**. The app then works without internet, including PDF export. Source links require internet. Browser storage eviction can remove the cached app. No patient identifier fields are provided. Free-text entries must remain non-identifying; the app cannot guarantee their contents.
 
-Run data lives in JavaScript memory only. Reloading, closing, browser eviction or a crash loses the run. Leave-page warnings depend on browser behavior. Export and verify the PDF before leaving. Timers are foreground visual reminders; device sleep or browser suspension can delay display. Wake lock is requested where supported.
+Recorded run data, inline drafts, team roster and display preferences are autosaved in IndexedDB on this device. Reopening offers Resume run or Start new run. New runs retain roster and display preferences but clear clinical data and weight. Storage failures and conflicting tabs show a warning; export PDF as the lasting record. Unsubmitted modal forms are not saved. Clearing browser data or browser eviction can remove the local copy. Timers are foreground visual reminders; device sleep or browser suspension can delay display. Wake lock is requested where supported.
 
 ## Local development
 
@@ -20,7 +20,7 @@ Serve `dist/` on localhost with a static server. JavaScript modules and service 
 
 ## Validation
 
-Calculator boundary checks cover weight requirements, adult/pediatric distinctions, drug maxima, repeat-dose limits, energy ceilings and dose/volume conversion. Browser tests exercise documentation, corrections, closure, no persistent run storage, PDF export offline, offline reload and tablet/mobile layouts. Real tablet Safari and Android browser evaluation and independent clinical validation remain necessary before live care.
+Calculator boundary checks cover weight requirements, adult/pediatric distinctions, drug maxima, repeat-dose limits, energy ceilings and dose/volume conversion. Browser tests exercise documentation, corrections, closure, local run recovery and conflicting-tab protection, PDF export offline, offline reload and tablet/mobile layouts. Real tablet Safari and Android browser evaluation and independent clinical validation remain necessary before live care.
 
 The optional section-navigation WebMCP interface is feature-detected. Native WebMCP was unavailable in the local test browser; that optional interface could not be validated in a supported context.
 
@@ -28,9 +28,9 @@ The optional section-navigation WebMCP interface is feature-detected. Native Web
 
 CPR start, pause, resume and stop, ROSC, rearrest and compressor changes log at the tap time. Optional details can be added from the confirmation strip or timeline without changing that timestamp. Undo records an audit-preserving void and restores the effective timer state.
 
-Add staff names / initials with colors under Add team. Select the person who performed the action in the persistent team strip; each form can override the performer for that entry. The recorder remains separate. Event names and colors are snapshots, so renaming or removing a teammate does not rewrite historical attribution. The PDF includes the roster, color markers, names and amendment history. Neither roster nor run survives reload.
+Add staff names / initials with colors under Add team. Select the person who performed the action in the persistent team strip; each form can override the performer for that entry. The recorder remains separate. Event names and colors are snapshots, so renaming or removing a teammate does not rewrite historical attribution. The PDF includes the roster, color markers, names and amendment history. Roster and recorded run data survive reload in the same browser profile.
 
-The updated service worker activates the new application shell without automatically reloading an open run. Export any active run before reloading to see an update.
+The updated service worker activates the new application shell without automatically reloading an open run. Before upgrading from a version without autosave, export any active run. Once autosave is active, wait for Saved on this device before leaving.
 
 ## Rapid entry update
 
@@ -45,3 +45,7 @@ Adult presets from user-supplied Meds.pdf (pages 1, 2, 4): epinephrine 1 mg IV o
 Pediatric arrest presets use 2025 AHA PALS: epinephrine 0.01 mg/kg capped at 1 mg; amiodarone 5 mg/kg capped at 300 mg first / 150 mg subsequent; lidocaine 1 mg/kg. Adult fixed doses never appear in pediatric mode. This does not represent independent clinical validation of the full user-provided medication document.
 
 Sources checked: https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Accessible/Algorithm-ACLS-CA-LngDscrp-250725-Ed.pdf and https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Accessible/Algorithm-PALS-CA-LngDscrp-250729-Ed.pdf
+
+## Clear everything
+
+The header has a large red confirmation dialog requiring an acknowledgement checkbox and a final erase action. It atomically replaces the saved state with a blank run and empty roster/preferences; already-downloaded PDFs remain. Revision checks prevent stale tabs from silently restoring cleared data. Only one run is retained locally; starting a new run requires confirming that the previous PDF was exported or the run is intentionally discarded.
