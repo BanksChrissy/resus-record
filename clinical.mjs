@@ -131,3 +131,21 @@ export function lifepakSteps(therapy){
  if(therapy==='Pacing')return ['Apply ECG leads and therapy pads; press PACER and check sensing markers.','Choose RATE; increase CURRENT to electrical capture.','Confirm mechanical capture with pulse or blood pressure. Provide analgesia/sedation as appropriate.'];
  return [];
 }
+
+export const GCS_CHOICES={
+ 'GCS eye':['4 · Spontaneous','3 · To sound','2 · To pressure','1 · No opening','NT · Not testable'],
+ 'GCS verbal':['5 · Oriented','4 · Confused conversation','3 · Words only','2 · Sounds only','1 · No verbal response','NT · Not testable'],
+ 'GCS motor':['6 · Obeys commands','5 · Localizes','4 · Normal flexion','3 · Abnormal flexion','2 · Extension','1 · No movement','NT · Not testable']
+};
+export const RASS_CHOICES=['+4 · Combative','+3 · Very agitated','+2 · Agitated','+1 · Restless','0 · Alert / calm','-1 · Drowsy','-2 · Light sedation','-3 · Moderate sedation','-4 · Deep sedation','-5 · Unarousable','NT · Not assessable'];
+export const VITAL_NUMBERS=['Heart rate (beats/min)','Systolic BP (mm Hg)','Diastolic BP (mm Hg)','SpO2 (%)','Respiratory rate (breaths/min)','EtCO2 (mm Hg)','MAP (mm Hg)','Temperature (°C)','Pain (0–10)','Oxygen flow (L/min)','Capillary refill (seconds)'];
+export function gcsTotal(data){const values=Object.entries(GCS_CHOICES).map(([key,options])=>options.includes(data[key])&&!data[key].startsWith('NT')?Number.parseInt(data[key],10):null);return values.every(v=>v!==null)?values.reduce((a,b)=>a+b,0):null;}
+export function normalizeVitals(input){const d={...input};for(const [k,v]of Object.entries(d)){if(v===''||v===undefined||v==='Not entered')delete d[k];}
+ for(const key of VITAL_NUMBERS){if(d[key]===undefined)continue;const n=Number(d[key]);if(!Number.isFinite(n)||(n<0&&key!=='Temperature (°C)')||(key==='SpO2 (%)'&&n>100)||(key==='Pain (0–10)'&&n>10))throw Error(`Check ${key}.`);d[key]=String(n);}
+ for(const[key,options]of Object.entries(GCS_CHOICES)){if(d[key]!==undefined&&!options.includes(d[key]))throw Error(`Choose a valid ${key} component.`);}
+ if(d.RASS!==undefined&&!RASS_CHOICES.includes(d.RASS))throw Error('Choose a valid RASS score.');
+ if(d['Systolic BP (mm Hg)']!==undefined&&d['Diastolic BP (mm Hg)']!==undefined&&Number(d['Systolic BP (mm Hg)'])<Number(d['Diastolic BP (mm Hg)']))throw Error('Systolic BP cannot be below diastolic BP. Check the values.');
+ if(d['Blood glucose']!==undefined){const b=String(d['Blood glucose']).trim().toUpperCase();if(!['HI','LO'].includes(b)&&(!/^\d+(\.\d+)?$/.test(b)||!Number.isFinite(Number(b))))throw Error('Blood glucose: enter a number, HI or LO.');d['Blood glucose']=b;if(!['mg/dL','mmol/L'].includes(d['Glucose units']))throw Error('Choose glucose units.');}else delete d['Glucose units'];
+ delete d['GCS total'];const total=gcsTotal(d);if(total!==null)d['GCS total']=String(total);
+ const clinical=[...VITAL_NUMBERS,...Object.keys(GCS_CHOICES),'RASS','Blood glucose','Orientation (A&O)','Alertness','Pupils','Skin / perfusion','Oxygen device','Details'];if(!clinical.some(k=>d[k]!==undefined))throw Error('Enter at least one observation before logging vitals.');return d;
+}
