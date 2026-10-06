@@ -49,3 +49,11 @@ Sources checked: https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/20
 ## Clear everything
 
 The header has a large red confirmation dialog requiring an acknowledgement checkbox and a final erase action. It atomically replaces the saved state with a blank run and empty roster/preferences; already-downloaded PDFs remain. Revision checks prevent stale tabs from silently restoring cleared data. Only one run is retained locally; starting a new run requires confirming that the previous PDF was exported or the run is intentionally discarded.
+
+## All-medication weight references
+
+Patient weight now populates every medication in the existing 53-item menu, with a searchable alphabetized list. Weight-based references recalculate after a valid weight and measured/estimated basis are entered; fixed doses remain visible. Invalid or incomplete edits suppress the previous calculation. Adult/pediatric mode, indication, route, dose ceilings and source are carried separately. An entered weight never records an administration. Choosing a reference opens medication documentation with an explicit status/route/save step; ranges require entering the actual dose. Previously recorded doses and their source/weight snapshots are not rewritten.
+
+SNHD July 1, 2026 protocols are the primary reference (page links are embedded). January 21, 2026 Drug Cards supplement medicines outside that formulary and are labeled supplemental. Entries requiring a prescription, age/condition selection, product preparation or a missing dose remain visible with a confirmation message. The list is not a claim that every listed medicine is authorized by SNHD. Existing three-drug arrest shortcuts remain unchanged.
+
+Run `node --test tests/med-catalog.test.mjs` for calculation and catalog checks.
