@@ -1,10 +1,10 @@
 # Resus Record
 
-Tablet-first, single-operator resuscitation documentation. Static app, no backend, no run persistence. Only the application shell is stored in the service-worker cache. Export is a client-generated PDF.
+Tablet-first, single-operator resuscitation documentation. Static app, no backend, with a local autosaved run. Only the application shell is stored in the service-worker cache. Export is a client-generated PDF.
 
 ## Clinical scope
 
-This is a testing build, not a clinically validated medical device or an AHA-endorsed product. Adult and pediatric references are independently implemented summaries of the linked 2025 AHA / AHA-AAP sources in `dist/clinical.mjs`. Neonatal resuscitation at birth is excluded. Cause-specific medicines remain protocol-specific rather than receiving invented universal doses.
+This is a testing build, not a clinically validated medical device or an AHA-endorsed product. Adult and pediatric references are independently implemented summaries of the linked 2025 AHA / AHA-AAP sources in `clinical.mjs`. Neonatal resuscitation at birth is excluded. Cause-specific medicines remain protocol-specific rather than receiving invented universal doses.
 
 Dose and energy calculations are references, never automatic orders or administrations. Enter actual medication status, dose, units, route, concentration and volume. The device clock supplies event times. The app cannot detect clinical state or verify entered values against the patient.
 
@@ -16,7 +16,7 @@ Recorded run data, inline drafts, team roster and display preferences are autosa
 
 ## Local development
 
-Serve `dist/` on localhost with a static server. JavaScript modules and service workers require HTTP localhost or HTTPS, not a file URL. No installation or build step is required. PDF-LIB is vendored with its license, avoiding an online dependency at runtime.
+Serve the repository root on localhost with a static server. JavaScript modules and service workers require HTTP localhost or HTTPS, not a file URL. No installation or build step is required. PDF-LIB is vendored with its license, avoiding an online dependency at runtime.
 
 ## Validation
 
@@ -57,3 +57,18 @@ Patient weight now populates every medication in the existing 53-item menu, with
 SNHD July 1, 2026 protocols are the primary reference (page links are embedded). January 21, 2026 Drug Cards supplement medicines outside that formulary and are labeled supplemental. Entries requiring a prescription, age/condition selection, product preparation or a missing dose remain visible with a confirmation message. The list is not a claim that every listed medicine is authorized by SNHD. Existing three-drug arrest shortcuts remain unchanged.
 
 Run `node --test tests/med-catalog.test.mjs` for calculation and catalog checks.
+
+
+## Diagnostics (October 12, 2026)
+
+Open **Diagnostics** in the left navigation. The 34 pathways are alphabetized and searchable by a finding, condition, investigation or treatment. Presenting-problem filters narrow the reference without scoring a patient or selecting a diagnosis. **First pass** starts with observation, immediate threats and a focused bedside examination. **Tools** groups examination techniques and equipment into no equipment, basic bedside, and advanced/definitive capabilities.
+
+Every pathway includes mechanism, urgent action triggers, specific bedside actions with interpretation and limitations, simple tools, differential diagnoses, targeted/definitive tests and timing, immediate treatment, definitive treatment and destination, advanced tools, reassessment, pediatric/pregnancy considerations and source links. Bedside assessment, basic tools, immediate care and reassessment are expanded initially. Definitive care remains visible as named sections, with **Jump to section** and **Expand all** controls.
+
+Coverage includes cardiopulmonary emergencies, traumatic hemorrhage and regional injury, stroke/seizures and altered mental status, metabolic/toxicologic causes, abdominal and gastrointestinal emergencies, pregnancy/postpartum emergencies, and pediatric respiratory failure/shock. It is a focused resuscitation reference, not an exhaustive diagnostic textbook. Drug administration continues through the existing medication workflow and protocol references.
+
+**Document assessment** opens a deliberate entry form with the reviewed pathway and reference version only. Diagnosis, findings, test results, care and response are never generated from browsing. Assessment status starts as **Not assessed**. Submitted entries use the existing timestamp, performer, local save, correction and PDF timeline behavior. Actual medication/procedure delivery is documented in Interventions. Searching, opening a pathway, changing a filter or following a section link records no clinical event. Unsubmitted modal text follows the existing unsaved-modal behavior. A new run clears diagnostic entries and the diagnostic browsing state.
+
+All diagnostic modules and styles are in the fixed v29 offline shell. Reading pathways and searching work after successful precaching; external source documents require internet. The update does not reload an open run automatically.
+
+Run `node --test tests/*.test.mjs` for medication calculations, diagnostic content/search, explicit-entry defaults, session/reset behavior, service-worker asset coverage, PDF fields, and UI interaction regression checks. The UI tests use a small DOM adapter, not a full browser. This update was checked without browser-based visual/layout QA; real-device review and independent clinical validation remain necessary.
