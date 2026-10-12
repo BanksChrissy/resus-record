@@ -20,7 +20,7 @@ Serve the repository root on localhost with a static server. JavaScript modules 
 
 ## Validation
 
-Calculator boundary checks cover weight requirements, adult/pediatric distinctions, drug maxima, repeat-dose limits, energy ceilings and dose/volume conversion. Browser tests exercise documentation, corrections, closure, local run recovery and conflicting-tab protection, PDF export offline, offline reload and tablet/mobile layouts. Real tablet Safari and Android browser evaluation and independent clinical validation remain necessary before live care.
+Automated checks cover the medication catalog, dose/volume and infusion arithmetic, unit boundaries, calculation-to-record handoff, saved-state/reset behavior, offline shell coverage, diagnostic content and real PDF output. Interaction tests use a small DOM adapter. This update has no full browser visual/layout validation. Real tablet Safari and Android browser evaluation and independent clinical validation remain necessary before live care.
 
 The optional section-navigation WebMCP interface is feature-detected. Native WebMCP was unavailable in the local test browser; that optional interface could not be validated in a supported context.
 
@@ -69,6 +69,33 @@ Coverage includes cardiopulmonary emergencies, traumatic hemorrhage and regional
 
 **Document assessment** opens a deliberate entry form with the reviewed pathway and reference version only. Diagnosis, findings, test results, care and response are never generated from browsing. Assessment status starts as **Not assessed**. Submitted entries use the existing timestamp, performer, local save, correction and PDF timeline behavior. Actual medication/procedure delivery is documented in Interventions. Searching, opening a pathway, changing a filter or following a section link records no clinical event. Unsubmitted modal text follows the existing unsaved-modal behavior. A new run clears diagnostic entries and the diagnostic browsing state.
 
-All diagnostic modules and styles are in the fixed v29 offline shell. Reading pathways and searching work after successful precaching; external source documents require internet. The update does not reload an open run automatically.
+All diagnostic modules and styles are in the fixed offline shell. Reading pathways and searching work after successful precaching; external source documents require internet. The update does not reload an open run automatically.
 
 Run `node --test tests/*.test.mjs` for medication calculations, diagnostic content/search, explicit-entry defaults, session/reset behavior, service-worker asset coverage, PDF fields, and UI interaction regression checks. The UI tests use a small DOM adapter, not a full browser. This update was checked without browser-based visual/layout QA; real-device review and independent clinical validation remain necessary.
+
+## Medication calculator (October 12, 2026)
+
+Open **Medication calculator** in the sidebar. Select a catalog medication or enter another medication name. Enter the selected order, its units and whether it is per kilogram. The calculator uses the shared patient weight and its measured/estimated basis. Weight edits in this section require **Use patient weight** before a weight-based result or record handoff; navigating away does not silently apply that draft.
+
+Enter concentration as an amount of drug in a **final total preparation volume**. For a concentration already expressed per mL, enter a final volume of 1 mL. The supplied drug/preparation label determines the concentration. No concentration is inferred from a drug name, percent strength, ratio, catalog entry or amount of diluent added. Order and concentration must refer to the same substance basis, including salt versus elemental amounts where applicable.
+
+Supported calculations:
+
+- **Bolus:** fixed or per-kg amount to calculated mL.
+- **Continuous infusion:** fixed or per-kg amount per minute or hour to calculated mL/hour.
+- **Timed infusion:** a total fixed or per-kg amount over an explicitly entered number of minutes to total mL and mL/hour.
+- **Volume orders:** mL or mL/kg, including timed or continuous volume rates, without an unnecessary drug-concentration conversion.
+
+The calculation supports g, mg and micrograms with explicit mass conversion. Units, mEq and mmol require matching order and concentration units; the calculator does not convert them to mass or to each other. Invalid inputs suppress the result. Calculations retain numeric precision internally, show their arithmetic and avoid displaying a positive tiny result as zero. The entered order is not automatically capped or rounded to syringe/pump increments. No clinical dose limits are evaluated for that order. Confirm the appropriate dosing weight (actual, ideal or adjusted), indication, route, limits and equipment precision.
+
+The selected medication's existing SNHD-first references remain available beside the calculator with indication, route, formulas, limits, notes and sources. They are reference information, separate from the entered order. No range endpoint, clinical dose or administration duration is selected automatically.
+
+**Review medication record** opens the existing medication form with the ordered dose and confirmed concentration. Status, actual administered dose/rate, administered volume and route still require explicit entry. Saving can record Ordered, Prepared, Administered or Withheld as selected. A matching calculation snapshot retains the order, preparation amount/final volume, weight used, arithmetic and calculated output in the event and PDF. Changing its drug, order, preparation, delivery or used weight detaches the old result. Calculation alone creates no medication event, changes no administration total and starts no medication timer. Infusion rates are never summed as total administered amounts.
+
+Changing the medication in either the calculator or full medication form clears the preceding drug's order/preparation/administration inputs. Calculator drafts autosave with the current run and clear on a new run. The v30 offline shell includes the calculator modules and styles; source links still require an internet connection.
+
+Method and medication-safety references:
+
+- [FDA: strength and unit notation](https://www.fda.gov/drugs/electronic-drug-registration-and-listing-system-edrls/strength-conversion-drug-listing)
+- [FDA: infusion-pump verification](https://www.fda.gov/medical-devices/infusion-pumps/infusion-pump-risk-reduction-strategies-clinicians)
+- [ISMP Canada: final preparation volume and overfill](https://www.ismp-canada.org/download/safetyBulletins/2013/ISMPCSB2013-07_ManagingOverfillIntravenousMedications.pdf)
